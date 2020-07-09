@@ -40,8 +40,7 @@ async function main() {
         // Submit the specified transaction.
         // createCar transaction - requires 5 argument, ex: ('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom')
         // changeCarOwner transaction - requires 2 args , ex: ('changeCarOwner', 'CAR12', 'Dave')
-        //await contract.submitTransaction('createBlog', 'BLOG2', 'Bae', 'Hello hi');
-        await contract.submitTransaction('changeBlog', 'BLOG2', 'Hello sdfasdf');
+        await contract.submitTransaction('createBlog', 'BLOG2', 'Bae', 'Hello hi');
         const result = await contract.evaluateTransaction('queryBlog', 'BLOG2');
         console.log(`Transaction has been submitted - result is: ${result.toString()}`);
         

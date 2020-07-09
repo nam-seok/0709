@@ -43,11 +43,41 @@ class FabUser extends Contract {
             }
         ];
 
+            const blogs = [
+                {
+                    title:"javascript",
+                    desc:"javascrip lanuage is interpreter language",
+                    author:  {
+                        username: 'kim',
+                        email: '123@gmail.com',
+                        phone: '010-1234-5678',
+                        words: 'Hello',
+                    }
+                },
+                {
+                    title:"java",
+                    desc:"java lanuage is interpreter language",
+                    author:  {
+                        username: 'bak',
+                        email: '456@gmail.com',
+                        phone: '010-2345-6789',
+                        words: 'Hello it me',
+                    }
+                }
+            ]
+
         for (let i = 0; i < users.length; i++) {
             users[i].docType = 'user';
             await ctx.stub.putState('USER' + i, Buffer.from(JSON.stringify(users[i])));
             console.info('Added <--> ', users[i]);
         }
+
+        for (let i = 0; i < blogs.length; i++) {
+            blogs[i].docType = 'blogs';
+            await ctx.stub.putState('BLOG' + i, Buffer.from(JSON.stringify(blogs[i])));
+            console.info('Added <--> ', blogs[i]);
+        }
+        
         console.info('============= END : Initialize Ledger ===========');
     }
 
@@ -59,6 +89,17 @@ class FabUser extends Contract {
         console.log(userAsBytes.toString());
         return userAsBytes.toString();
     }
+
+
+    async queryBlog(ctx, blogNumber) {
+        const blogAsBytes = await ctx.stub.getState(blogNumber); // get the car from chaincode state
+        if (!blogAsBytes || blogAsBytes.length === 0) {
+            throw new Error(`${blogNumber} does not exist`);
+        }
+        console.log(blogAsBytes.toString());
+        return blogAsBytes.toString();
+    }
+
 
     async createUser(ctx, userNumber, username, email, phone, words) {
         console.info('============= START : Create User ===========');
@@ -74,6 +115,27 @@ class FabUser extends Contract {
         await ctx.stub.putState(userNumber, Buffer.from(JSON.stringify(users)));
         console.info('============= END : Create User ===========');
     }
+
+
+    async createBlog(ctx, userNumber, blogNumber, title, desc) {
+        console.info('============= START : Create Blog ===========');
+            const userAsBytes = await ctx.stub.getState(userNumber); // get the car from chaincode state
+            if (!userAsBytes || userAsBytes.length === 0) {
+                throw new Error(`${userNumber} does not exist`);
+            }
+            const users = await JSON.parse(userAsBytes.toString());
+
+        const blogs = {
+            title,
+            docType: 'blog',
+            desc,
+            author:users,
+        };
+
+        await ctx.stub.putState(blogNumber, Buffer.from(JSON.stringify(blogs)));
+        console.info('============= END : Create Blog ===========');
+    }
+
 
     async queryAllUsers(ctx) {
         const startKey = 'USER0';
@@ -94,6 +156,27 @@ class FabUser extends Contract {
         return JSON.stringify(allResults);
     }
 
+
+    async queryAllBlogs(ctx) {
+        const startKey = 'BLOG0';
+        const endKey = 'BLOG99';
+        const allResults = [];
+        for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
+            const strValue = Buffer.from(value).toString('utf8');
+            let record;
+            try {
+                record = JSON.parse(strValue);
+            } catch (err) {
+                console.log(err);
+                record = strValue;
+            }
+            allResults.push({ Key: key, Record: record });
+        }
+        console.info(allResults);
+        return JSON.stringify(allResults);
+    }
+
+
     async changeUsername(ctx, userNumber, newUsername) {
         console.info('============= START : changeUsernamer ===========');
 
@@ -108,6 +191,20 @@ class FabUser extends Contract {
         console.info('============= END : changeUsername ===========');
     }
 
+
+    async changeBlog(ctx, blogNumber, newDesc) {
+        console.info('============= START : changeBlog ===========');
+
+        const blogAsBytes = await ctx.stub.getState(blogNumber); // get the car from chaincode state
+        if (!blogAsBytes || blogAsBytes.length === 0) {
+            throw new Error(`${blogNumber} does not exist`);
+        }
+        const blogs = JSON.parse(blogAsBytes.toString());
+        blogs.blogname = newDes;
+
+        await ctx.stub.putState(blogNumber, Buffer.from(JSON.stringify(blogs)));
+        console.info('============= END : changeBlog ===========');
+    }
 }
 
 module.exports = FabUser;

@@ -19,10 +19,13 @@
     "express": "^4.17.1",
     "express-flash-messages": "^0.1.1",
     "express-session": "^1.17.1",
+    "fabric-ca-client": "^2.1.0",
+    "fabric-network": "^2.1.0",
     "mongoose": "^5.9.19",
     "mongoose-unique-validator": "^2.0.3",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "shelljs": "^0.8.4"
   }
 }
